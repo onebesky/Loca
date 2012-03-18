@@ -8,6 +8,12 @@ body
         background-image: url('../images/page-bg.png');
 }
 
+h3 {
+    font: normal 16pt Arial,Helvetica,sans-serif;
+    color: #6D6D6D;
+    font-weight: bold;
+}
+
 #header-container {
     height: 98px;
     padding: 0px;
@@ -32,8 +38,8 @@ body
     color: white;
     font-size: 24px;
     font-family: sans-serif;
-    margin-left: 400px;
-    margin-top: 30px;
+    margin-left: 460px;
+    margin-top: 35px;
 }
 
 #page
@@ -65,7 +71,7 @@ body
 	margin: 10px 20px;
 	font-size: 0.8em;
 	text-align: center;
-	border-top: 1px solid #C9E0ED;
+	border-top: 1px solid #ddd;
 }
 
 #logo
@@ -238,7 +244,7 @@ div.search-form
 /* CORA */
 
 h2, .main-title {
-    font: normal normal 600 22px/normal Arial;
+    font: normal normal 600 18px/normal Arial;
     color: #357183;
     margin-top: 15px;
     margin-bottom: 12px;
@@ -251,11 +257,12 @@ h2, .main-title {
 .project-title .title, .project-link {
     color: #357183;
     display: block;
-    font: normal normal 400 34px/normal Arial;
+    font: normal normal 400 26px/normal Arial;
     text-decoration: none;
     text-shadow: 0px 1px 2px #4493ae;
     display: inline-block;
     margin-right: 12px;
+    margin-left: 18px;
     vertical-align: middle;
 }
 
@@ -404,7 +411,6 @@ a.main-button:hover{
 }
 
 .tree-holder {
-    /*margin-left: 16px;*/
     padding: 0px;
 }
 .dir-line, .file-line {
@@ -509,4 +515,20 @@ a.main-button:hover{
     background-color: #D1E8D2;
     border-color: #393;
     color: #00632E;
+}
+
+.intro {
+    position: relative;
+    float: left;
+    width: 380px;
+    margin-top: 12px;
+    margin-bottom: 8px;
+    border:2px solid #4493ae;
+    border-radius:10px;
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    -o-border-radius:10px;
+    -khtml-border-radius:10px;
+    padding: 20px;
+    margin-left: 20px;
 }

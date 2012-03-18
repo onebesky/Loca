@@ -12,6 +12,7 @@ class Shared {
      * @param <type> $message 
      */
     public static function debug($object, $message = '') {
+        if (!YII_DEBUG) return true;
         $trace = debug_backtrace();
         $file = $trace[0]['file'];
         $line = $trace[0]['line'];
