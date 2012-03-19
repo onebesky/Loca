@@ -86,6 +86,8 @@
         var fileCount = 0;
         var processed = 0;
         
+        var running = false;
+        
         // jqplot object
         var plot;
         
@@ -348,6 +350,7 @@
         function recalculateStats(){
             $.ajax({
                 "success": function(data) {
+                    running = false;
                     $("#progress-holder").html("Done").removeClass('working').addClass('ready');
                     reloadFileView();
                     // refresh project totals
@@ -355,15 +358,37 @@
                 },
                 "type":"POST",
                 "beforeSend": function( ) {
-                    $("#progress-holder").html("Calculating");
+                    $("#progress-holder").html("Calculating <span id='processing-file'></span>");
+                    running = true;
                 },
                 "error": function(){
                     filecount = 0;
                     $("#progress-holder").html("Could not process the files. Please see the error log.");
+                    running = false;
                 },
                 "url":"<?php echo Yii::app()->createAbsoluteUrl('/file/recalculateStats') ?>",
                 "cache":false
             });
+        }
+        
+        // get name of file, which is being processed right now
+        // problem with multiple requests
+        function updateCurrentFile($holder){
+        if (!running) return false;
+        console.log('update');
+        $.ajax({
+                "success": function(data) {
+                    $("#processing-file").html( '(' + data + ')');
+                    console.log(data);
+                    keepUpdatingCurrentFile();
+                },
+                "url":"<?php echo Yii::app()->createAbsoluteUrl('/file/getCurrentFile') ?>"
+            });
+        }
+        
+        function keepUpdatingCurrentFile(){
+            $holder = $("#processing-file");
+            setTimeout(updateCurrentFile, 200);
         }
         
         /**
@@ -382,11 +407,12 @@
                 },
                 "type":"POST",
                 "beforeSend": function( ) {
-                    $("#progress-holder").html("Scanning files, it might take a couple of minutes");
+                    $("#progress-holder").html("Scanning files, it might take a couple of minutes <span id='processing-file'></span>");
                 },
                 "error": function(){
                     filecount = 0;
                     $("#progress-holder").html("Could not process the files. Please see the error log.");
+                    running = false;
                 },
                 "url":"<?php echo Yii::app()->createAbsoluteUrl('/file/process') ?>",
                 "cache":false
@@ -404,7 +430,9 @@
                 },
                 "type":"POST",
                 "beforeSend": function( request ) {
-                    $("#progress-holder").html("Scanning files").removeClass('ready').addClass('working');
+                    $("#progress-holder").html("Scanning files <span id='processing-file'></span>").removeClass('ready').addClass('working');
+                    running = true;
+                    //keepUpdatingCurrentFile();
                 },
                 "error": function(request,error){
                     filecount = 0;

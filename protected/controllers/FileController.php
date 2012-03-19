@@ -11,6 +11,8 @@ class FileController extends Controller {
      * this function does not perform any calculations, only searches for new files 
      */
     public function actionCrawl() {
+        // this will run a while
+        set_time_limit(300);
         $project = Cora::getActiveProject();
         // we should detect this before, so the project dashboard shows warning and goes to configuration
         if (is_object($project)) {
@@ -56,10 +58,24 @@ class FileController extends Controller {
     }
 
     /**
+     * Ajax callback to update currently processed file 
+     */
+    public function actionGetCurrentFile() {
+        if (isset(Yii::app()->session['file'])) {
+            Shared::debug(Yii::app()->session['file'], 'Current File');
+            echo Yii::app()->session['file'];
+        } else {
+            echo "no file";
+        }
+    }
+
+    /**
      * Sum comnts for files in directories and apply given filters.
      * Run it after all the file stats are calculated 
      */
     public function actionRecalculateStats() {
+        set_time_limit(300);
+        // TODO: run it incrementaly
         $project = Cora::getActiveProject();
         if (is_object($project)) {
             FileIndexer::calculateDirs($project->path);
@@ -74,6 +90,8 @@ class FileController extends Controller {
      * @param type $directory 
      */
     public function actionGetDir() {
+        // this will run a while
+
         $project = Cora::getActiveProject();
         if (is_object($project)) {
             $path = $project->path;

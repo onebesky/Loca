@@ -7,8 +7,8 @@ class FileIndexer {
 
     // gonna be loaded from config; assoc array is faster
     public static $indexFilters = array('.' => true, '..' => true, '.svn' => true, 'CSV' => true);
-    //public static $forceReload = false;
 
+    //public static $forceReload = false;
     // what about file types ... we don't need to index all of them
 
     public static function crawl($startPath, $limit = 8) {
@@ -19,13 +19,13 @@ class FileIndexer {
         $fileConfig = $project->getFileConfig();
 
         // delete all the files, so the deleted files are not calculated
-        /*if (self::$forceReload) {
-            Shared::debug("deleting files");
-            Yii::app()->db->createCommand("DELETE FROM file WHERE path LIKE '$startPath%'")->execute();
-            
-            // delete files only once
-            self::$forceReload = false;
-        }*/
+        /* if (self::$forceReload) {
+          Shared::debug("deleting files");
+          Yii::app()->db->createCommand("DELETE FROM file WHERE path LIKE '$startPath%'")->execute();
+
+          // delete files only once
+          self::$forceReload = false;
+          } */
 
         $startPath = str_replace("\\", "/", $startPath);
         if (substr_compare($startPath, '/', -1, 1) != 0)
@@ -42,6 +42,7 @@ class FileIndexer {
                 $files[$row['path'] . $row['filename']] = $row;
             }
 
+            $i = 0;
             $dh = opendir($startPath);
             Shared::debug("opening $startPath");
             if ($dh) {
@@ -54,6 +55,13 @@ class FileIndexer {
                         $extension = substr($filename, strrpos($filename, '.') + 1);
                         $type = filetype($fullPath);
 
+                        if ($i == 0) {
+                            Yii::app()->session['file'] = $fullPath;
+                            $i = 1;
+                        } else {
+                            $i++;
+                            $i = $i % 10;
+                        }
                         if ($type != 'dir' && !isset($fileConfig[$extension])) {
                             Shared::debug("$extension is not supported.");
                         } else {
@@ -62,7 +70,6 @@ class FileIndexer {
                             $file->last_modification = filemtime($fullPath);
 
                             //Shared::debug("processing $filename");
-
                             // update the file in the database?
                             //$update = true;
                             if (isset($files[$fullPath])) {
@@ -84,7 +91,7 @@ class FileIndexer {
                                 $file->filename = $filename;
                                 $file->last_indexed = time();
                                 $file->project_id = $project->project_id;
-                                
+
                                 if ($type == 'file') {
                                     $file->filetype = 'file';
                                 } else if ($type == 'dir') {
@@ -104,7 +111,7 @@ class FileIndexer {
                                 self::crawl($fullPath, $limit - 1);
                             }
                         }
-                    }else{
+                    } else {
                         Shared::debug("$filename is filtered");
                     }
                 }
@@ -124,10 +131,15 @@ class FileIndexer {
         // load list of unprocessed files
         $files = File::model()->findAllBySql("SELECT * FROM file WHERE processed = 0 AND filetype = 'file' AND project_id = {$project->project_id} LIMIT 0,$limit");
 
+        $i = 0;
         foreach ($files as $file) {
-            /* $file = new File;
-              $file->path = $_file['path'];
-              $file->filename = $_file['filename']; */
+            if ($i == 0) {
+                Yii::app()->session['file'] = $file->path . $file->filename;
+                $i = 1;
+            } else {
+                $i++;
+                $i = $i % 10;
+            }
             $file->process();
         }
         return count($files);
@@ -182,12 +194,19 @@ class FileIndexer {
             }
         }
 
-        //Shared::debug($files);
+        $i = 0;
         // step 2: find parents of each file and start counting
         foreach ($files as $file) {
             if (!$file['filtered']) {
                 //Shared::debug("file " . $file['filename'] . ' has ' . $file['lines_total'] . ' lines of code.');
                 $filename = $file['path'] . $file['filename'];
+                if ($i == 0) {
+                    Yii::app()->session['file'] = $filename;
+                    $i = 1;
+                } else {
+                    $i++;
+                    $i = $i % 10;
+                }
                 $parts = explode("/", $filename);
                 //Shared::debug(count($parts) - 1);
                 //Shared::debug($parts);
@@ -204,7 +223,7 @@ class FileIndexer {
                     if (isset($dirs[$parentPath])) {
                         //Shared::debug("update from " . $file['filename'] . " - $parentPath");
                         $parent = &$dirs[$parentPath];
-                        foreach (File::$track as $attr){
+                        foreach (File::$track as $attr) {
                             $parent[$attr] += $file[$attr];
                         }
                     } else {
