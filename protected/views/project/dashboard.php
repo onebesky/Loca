@@ -198,7 +198,6 @@
                 },
                 "dataType": "json",
                 "type":"POST",
-                "data":"restart="+restart,
                 "beforeSend": function( request ) {
                     // loading gif instead of the button
                     var $button = $("#file-" + fileId + " div .filter-button");
@@ -238,7 +237,6 @@
                 },
                 "dataType": "json",
                 "type":"POST",
-                "data":"restart="+restart,
                 "beforeSend": function( request ) {
                     // loading gif instead of the button
                     var $button = $("#file-" + fileId + " div .filter-button");
@@ -273,7 +271,7 @@
                 },
                 "dataType": "json",
                 "type":"POST",
-                //"data":"restart="+restart,
+
                 "beforeSend": function( request ) {
                     $("#progress-holder").html("loading data").removeClass('ready').addClass('working');
                     // loading gif
@@ -308,7 +306,6 @@
                         },
                         "dataType": "json",
                         "type":"POST",
-                        //"data":"restart="+restart,
                         "beforeSend": function( request ) {
                             $holder.slideDown('fast');
                             $holder.html("Scanning files");
